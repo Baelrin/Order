@@ -100,7 +100,10 @@ async def C(ctx, threshold: int = JOIN_TIME_THRESHOLD):
 # Event on_ready
 @bot.event
 async def on_ready():
-    logging.info(f"Logged in as {bot.user.name}")
+    if bot.user is not None:
+        logging.info(f"Logged in as {bot.user.name}")
+    else:
+        logging.info("User is None")
 
 
 # Run bot
