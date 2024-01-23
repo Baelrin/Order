@@ -52,7 +52,7 @@ async def change_role_and_send_message(member, old_role, new_role, channel):
     try:
         await member.remove_roles(old_role)
         await member.add_roles(new_role)
-        await channel.send(f"{member.mention}, поздравляю с получением нового титула.")
+        await channel.send(f"{member.mention}, поздравляю с новым титулом!")
     except discord.Forbidden as e:
         logging.error(f"Error changing role and sending message: {e}")
         raise
