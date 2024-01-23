@@ -89,12 +89,14 @@ async def C(ctx, threshold: int = JOIN_TIME_THRESHOLD):
         return
 
     members = await get_members_with_old_role(guild)
-    tasks = [
+    if tasks := [
         change_role_and_send_message(member, old_role, new_role, channel)
         for member in members
         if check_join_time(member, threshold)
-    ]
-    await asyncio.gather(*tasks)
+    ]:
+        await asyncio.gather(*tasks)
+    else:
+        await ctx.send("Достойных кандидатов не нашлось, милорд.")
 
 
 # Event on_ready
