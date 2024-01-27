@@ -7,7 +7,6 @@ import discord
 import pytz
 from discord.ext import commands
 
-
 # Read the configuration file
 def read_config():
     try:
@@ -72,8 +71,7 @@ def check_join_time(member, threshold):
 
 
 # Command check
-@bot.command()
-async def C(ctx, threshold: int = JOIN_TIME_THRESHOLD):
+async def handle_command(ctx, threshold: int = JOIN_TIME_THRESHOLD):
     if not check_admin_role(ctx):
         await ctx.send("У вас нет прав на выполнение этой команды.")
         return
@@ -97,6 +95,14 @@ async def C(ctx, threshold: int = JOIN_TIME_THRESHOLD):
         await asyncio.gather(*tasks)
     else:
         await ctx.send("Достойных кандидатов не нашлось, милорд.")
+
+@bot.command()
+async def C(ctx, threshold: int = JOIN_TIME_THRESHOLD):
+    await handle_command(ctx, threshold)
+
+@bot.command()
+async def c(ctx, threshold: int = JOIN_TIME_THRESHOLD):
+    await handle_command(ctx, threshold)
 
 
 # Event on_ready
