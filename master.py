@@ -8,6 +8,8 @@ import pytz
 from discord.ext import commands
 
 # Read the configuration file
+
+
 def read_config():
     try:
         with open("config.json") as f:
@@ -20,7 +22,7 @@ def read_config():
 config = read_config()
 
 # Variables
-TOKEN = "TOKEN"
+TOKEN = #your bot token
 ADMIN_ROLE_ID = config["ADMIN_ROLE_ID"]
 OLD_ROLE_ID = config["OLD_ROLE_ID"]
 NEW_ROLE_ID = config["NEW_ROLE_ID"]
@@ -39,38 +41,49 @@ intents = discord.Intents.all()
 # Bot
 bot = commands.Bot(command_prefix=PREFIX, intents=intents)
 
-
 # Get list of members with OLD_ROLE
+
+
 async def get_members_with_old_role(guild):
     old_role = guild.get_role(OLD_ROLE_ID)
     return old_role.members if old_role else []
 
+# Change role and send message in channel with retry logic
 
-# Change role and send message in channel
-async def change_role_and_send_message(member, old_role, new_role, channel):
-    try:
-        await member.remove_roles(old_role)
-        await member.add_roles(new_role)
-        await channel.send(f"{member.mention}, поздравляю с новым титулом!")
-    except discord.Forbidden as e:
-        logging.error(f"Error changing role and sending message: {e}")
-        raise
 
+async def change_role_and_send_message_with_retry(member, old_role, new_role, channel, max_retries=5):
+    for attempt in range(max_retries):
+        try:
+            await member.remove_roles(old_role)
+            await member.add_roles(new_role)
+            await channel.send(f"{member.mention}, поздравляю с новым титулом!")
+            break  # Запрос успешно выполнен, выходим из цикла
+        except discord.Forbidden as e:
+            logging.error(f"Error changing role and sending message: {e}")
+            if attempt >= max_retries - 1:
+                raise  # Если все попытки исчерпаны, поднимаем исключение
+            wait_time = 2 ** attempt  # Экспоненциальная задержка
+            logging.info(f"Waiting {wait_time} seconds before retrying...")
+            await asyncio.sleep(wait_time)
 
 # Check for admin role
+
+
 def check_admin_role(ctx):
     admin_role = ctx.guild.get_role(ADMIN_ROLE_ID)
     return admin_role in ctx.author.roles if admin_role else False
 
-
 # Check member's join time
+
+
 def check_join_time(member, threshold):
     join_time = member.joined_at.astimezone(pytz.timezone(TIMEZONE))
     current_time = datetime.datetime.now(pytz.timezone(TIMEZONE))
     return (current_time - join_time).total_seconds() > threshold
 
-
 # Command check
+
+
 async def handle_command(ctx, threshold: int = JOIN_TIME_THRESHOLD):
     if not check_admin_role(ctx):
         await ctx.send("У вас нет прав на выполнение этой команды.")
@@ -88,7 +101,8 @@ async def handle_command(ctx, threshold: int = JOIN_TIME_THRESHOLD):
 
     members = await get_members_with_old_role(guild)
     if tasks := [
-        change_role_and_send_message(member, old_role, new_role, channel)
+        change_role_and_send_message_with_retry(
+            member, old_role, new_role, channel)
         for member in members
         if check_join_time(member, threshold)
     ]:
@@ -96,23 +110,25 @@ async def handle_command(ctx, threshold: int = JOIN_TIME_THRESHOLD):
     else:
         await ctx.send("Достойных кандидатов не нашлось, милорд.")
 
+
 @bot.command()
 async def C(ctx, threshold: int = JOIN_TIME_THRESHOLD):
     await handle_command(ctx, threshold)
+
 
 @bot.command()
 async def c(ctx, threshold: int = JOIN_TIME_THRESHOLD):
     await handle_command(ctx, threshold)
 
-
 # Event on_ready
+
+
 @bot.event
 async def on_ready():
     if bot.user is not None:
         logging.info(f"Logged in as {bot.user.name}")
     else:
         logging.info("User is None")
-
 
 # Run bot
 try:
