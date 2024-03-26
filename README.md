@@ -5,7 +5,7 @@ This is a Discord bot implementation that changes roles for users who have joine
 ## Installation
 
 Clone the repository:
-`bash git clone https://github.com/Baelrin-Revel/order.git`
+`bash git clone https://github.com/Baelrin/order.git`
 
 Navigate to the project directory:
 `bash cd discord-role-changer`
