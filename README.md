@@ -1,11 +1,11 @@
-# Discord Role Changer
+# Order
 
 This is a Discord bot implementation that changes roles for users who have joined the server for longer than a certain period. It reads the configuration from a `config.json` file and uses the values to perform its operations.
 
 ## Installation
 
 Clone the repository:
-`bash git clone https://github.com/YourUsername/discord-role-changer.git`
+`bash git clone https://github.com/Baelrin-Revel/order.git`
 
 Navigate to the project directory:
 `bash cd discord-role-changer`
@@ -27,7 +27,7 @@ Create a `config.json` file with the following structure:
 Replace the placeholders with your actual values.
 
 Run the bot:
-`bash python main.py`
+`bash python master.py`
 
 ## Usage
 
