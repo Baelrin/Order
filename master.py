@@ -2,6 +2,7 @@ import asyncio
 import datetime
 import json
 import logging
+import random
 
 import discord
 import pytz
@@ -52,7 +53,10 @@ async def change_role_and_send_message(member, old_role, new_role, channel):
     try:
         await member.remove_roles(old_role)
         await member.add_roles(new_role)
-        await channel.send(f"{member.mention}, поздравляю с новым титулом!")
+        with open("messages.json", "r") as file:
+            messages = json.load(file)
+        message = random.choice(messages)
+        await channel.send(message.format_map({"member": member.mention}))
     except discord.Forbidden as e:
         logging.error(f"Error changing role and sending message: {e}")
         raise
